@@ -444,7 +444,7 @@ window.HUD = (function () {
 
     var gain = 0;
     if (ok) {
-      gain = 10 + Math.min(q.combo, 5) * 2 + Math.floor(q.left / 3);
+      gain = 6 + Math.min(q.combo, 5) + Math.floor(q.left / 5);
       q.combo += 1;
       q.maxCombo = Math.max(q.maxCombo, q.combo);
       q.right += 1;
