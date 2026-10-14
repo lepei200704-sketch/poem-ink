@@ -191,60 +191,62 @@ html, body {
 /* ============================================================
    1. 择诗魂
    ============================================================ */
-.poet-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-  gap: 14px;
+.court-wrap { position: relative; overflow: hidden; border-radius: var(--radius); }
+.poet-scene {
+  position: relative; aspect-ratio: 16 / 9; overflow: hidden;
+  background: url('../assets/bg-court.jpg') center bottom / cover no-repeat var(--paper-deep);
+  border: 1px solid var(--paper-line); border-radius: var(--radius);
+  box-shadow: 0 14px 40px -18px var(--shadow), inset 0 0 90px rgba(90,60,20,.14);
 }
-.poet-card {
-  position: relative;
-  border: 1px solid var(--paper-line);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(240,230,209,.7));
-  cursor: pointer;
-  transition: transform .3s var(--motion), box-shadow .3s var(--motion), border-color .3s;
-  box-shadow: 0 8px 22px -16px var(--shadow);
+.figure {
+  position: absolute; bottom: 3%; left: var(--fx); width: var(--fw); z-index: var(--fz);
+  cursor: pointer; transform-origin: 50% 100%;
+  animation: fig-sway 5.6s ease-in-out var(--fd) infinite alternate;
+  -webkit-tap-highlight-color: transparent;
 }
-.poet-card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 16px 30px -18px rgba(43,37,32,.5); }
-.poet-card.is-chosen { border-color: var(--cinnabar); box-shadow: 0 0 0 2px rgba(166,59,42,.35), 0 16px 32px -18px rgba(166,59,42,.6); }
-.poet-card .art {
-  position: relative; aspect-ratio: 4 / 4.4; overflow: hidden;
-  background: linear-gradient(180deg, var(--paper), var(--paper-deep));
+.figure::after {
+  content: ""; position: absolute; left: 10%; right: 10%; bottom: 1%;
+  height: 16px; z-index: -1; filter: blur(3px);
+  background: radial-gradient(ellipse at center, rgba(45,30,12,.38), transparent 68%);
 }
-.poet-card .art img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; }
-.poet-card .art::after {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(247,239,221,.65) 0%, rgba(247,239,221,0) 34%, rgba(43,37,32,.10) 100%);
+.fig-frame {
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 95%);
+  mask-image: linear-gradient(to bottom, #000 58%, transparent 95%);
+  transition: transform .35s var(--motion), filter .35s;
 }
-.poet-card .art .breath { animation: breath 6.5s ease-in-out infinite; }
-.poet-card.is-chosen .art .breath { animation-duration: 4.6s; }
-@keyframes breath { 0%,100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.035) translateY(-4px); } }
-.poet-card .meta { padding: 10px 12px 12px; position: relative; }
-.poet-card .meta .nm { display: flex; align-items: baseline; gap: 6px; }
-.poet-card .meta .nm strong { font-size: 17px; letter-spacing: 2px; font-family: var(--song); }
-.poet-card .meta .nm em { font-style: normal; font-size: 11px; color: var(--ink-soft); }
-.poet-card .meta .style {
-  margin-top: 5px; font-size: 12px; color: var(--cinnabar);
-  letter-spacing: 1px; display: inline-block;
-  padding: 2px 8px; border: 1px solid rgba(166,59,42,.3); border-radius: 999px;
-  background: rgba(255,246,238,.7);
+.fig-frame img { width: 100%; display: block; }
+.figure:hover { animation-play-state: paused; z-index: 9; }
+.figure:hover .fig-frame { transform: translateY(-9px) scale(1.04); filter: brightness(1.06) saturate(1.08); }
+.figure.sel { z-index: 8; animation-play-state: paused; }
+.figure.sel .fig-frame { filter: drop-shadow(0 0 16px rgba(201,161,90,.95)) saturate(1.1); }
+.f-tag {
+  position: absolute; left: 50%; bottom: -6px; transform: translate(-50%, 6px);
+  opacity: 0; transition: all .3s var(--motion); pointer-events: none; white-space: nowrap;
+  background: rgba(30,20,8,.8); color: #f2e0b0; border: 1px solid rgba(201,161,90,.65);
+  padding: 3px 13px; border-radius: 999px; font-size: 13px; letter-spacing: 2px;
 }
-.poet-card .meta .craft { margin-top: 7px; font-size: 11px; color: var(--ink-soft); line-height: 1.5; }
-.poet-card .tag-chosen {
-  position: absolute; top: 10px; right: 10px; z-index: 2;
-  font-size: 11px; padding: 3px 9px; border-radius: 999px;
-  color: #fff6ec; background: linear-gradient(150deg, var(--cinnabar-lt), var(--cinnabar));
-  letter-spacing: 1px; box-shadow: 0 3px 10px -4px rgba(166,59,42,.9);
+.figure:hover .f-tag, .figure.sel .f-tag { opacity: 1; transform: translate(-50%, 0); }
+.figure.sel .f-tag { background: var(--gold); color: #3a2708; }
+@keyframes fig-sway {
+  from { transform: rotate(calc(var(--fr) - .7deg)) translateY(0); }
+  to { transform: rotate(calc(var(--fr) + .7deg)) translateY(-4px); }
 }
 
 .poet-sheet {
-  margin-top: 16px; padding: 16px 20px;
-  border: 1px solid var(--paper-line); border-radius: var(--radius);
-  background: linear-gradient(180deg, rgba(255,255,255,.66), rgba(243,233,213,.6));
-  box-shadow: 0 8px 24px -18px var(--shadow);
-  min-height: 96px;
+  position: absolute; top: 2.5%; right: 1.6%; bottom: 2.5%; width: 330px; z-index: 20;
+  padding: 18px 20px 16px; overflow-y: auto;
+  border: 1px solid var(--gold); border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(255,252,244,.97), rgba(247,238,220,.96));
+  box-shadow: -10px 0 34px -12px rgba(43,37,32,.5);
+  transform: translateX(calc(100% + 40px)); transition: transform .45s var(--motion);
 }
+.poet-sheet.open { transform: translateX(0); }
+.sheet-close {
+  position: absolute; top: 8px; right: 12px; z-index: 2;
+  background: none; border: none; cursor: pointer;
+  font-size: 22px; line-height: 1; color: var(--ink-soft);
+}
+.sheet-close:hover { color: var(--cinnabar); }
 .poet-sheet .sheet-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .poet-sheet .sheet-top strong { font-size: 18px; letter-spacing: 2px; font-family: var(--song); }
 .poet-sheet .sheet-top .style { color: var(--cinnabar); font-size: 13px; }
@@ -637,7 +639,9 @@ html, body {
   .brand-text h1 { font-size: 18px; letter-spacing: 2px; }
   .q-options { grid-template-columns: 1fr; }
   .q-prompt { font-size: 19px; letter-spacing: 3px; }
-  .poet-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .poet-scene { aspect-ratio: 3 / 4; }
+  .poet-sheet { width: min(320px, 92%); }
+  .f-tag { font-size: 11px; padding: 2px 9px; }
   .quiz-hud { grid-template-columns: 1fr 1fr 1fr; }
   .hud-cell.wide { grid-column: 1 / -1; }
   #tabs button { font-size: 11px; letter-spacing: 1px; padding: 8px 2px; }

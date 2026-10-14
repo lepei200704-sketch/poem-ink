@@ -75,37 +75,40 @@ window.HUD = (function () {
   /* ============================================================
      1. 择诗魂
      ============================================================ */
+  /* 庭院雅集：五位诗魂的站位 / 体量 / 倾角 / 摇曳相位 */
+  var FIG_LAYOUT = [
+    { x: '5%',  w: '19%', r: '-2deg',   d: '0',   z: 3 },
+    { x: '24%', w: '17%', r: '1.2deg',  d: '0.7', z: 2 },
+    { x: '42%', w: '16%', r: '-0.6deg', d: '1.4', z: 1 },
+    { x: '60%', w: '17%', r: '0.9deg',  d: '0.4', z: 2 },
+    { x: '78%', w: '18%', r: '2deg',    d: '1.0', z: 3 }
+  ];
+
   function renderPoets() {
     var grid = $('#poet-grid');
     if (!grid) return;
     var chosen = window.Store.get().poetId;
     grid.innerHTML = '';
-    (window.POETS || []).forEach(function (p) {
-      var card = document.createElement('div');
-      card.className = 'poet-card' + (chosen === p.id ? ' is-chosen' : '');
-      card.setAttribute('data-id', p.id);
-      card.innerHTML =
-        (chosen === p.id ? '<span class="tag-chosen">已择</span>' : '') +
-        '<div class="art"><img class="breath" src="' + p.portrait + '" alt="' + esc(p.name) + '"></div>' +
-        '<div class="meta">' +
-          '<div class="nm"><strong>' + esc(p.name) + '</strong><em>' +
-            esc([p.zi ? p.zi : '', p.hao ? p.hao : '', p.dynasty].filter(Boolean).join(' · ')) + '</em></div>' +
-          '<div class="style">' + esc(p.styleName) + '</div>' +
-          '<div class="craft">非遗徽章 · ' + esc(p.heritage.craft) + '</div>' +
-        '</div>';
-      card.addEventListener('click', function () { selectPoet(p.id); });
-      grid.appendChild(card);
+    (window.POETS || []).forEach(function (p, i) {
+      var L = FIG_LAYOUT[i % FIG_LAYOUT.length];
+      var fig = document.createElement('div');
+      fig.className = 'figure' + (chosen === p.id ? ' sel' : '');
+      fig.setAttribute('data-id', p.id);
+      fig.setAttribute('style', '--fx:' + L.x + ';--fw:' + L.w + ';--fr:' + L.r + ';--fd:' + L.d + 's;--fz:' + L.z);
+      fig.innerHTML =
+        '<div class="fig-frame"><img src="' + p.portrait + '" alt="' + esc(p.name) + '"></div>' +
+        '<span class="f-tag">' + esc(p.name) + ' · ' + esc(p.styleName) + '</span>';
+      fig.addEventListener('click', function () { selectPoet(p.id); });
+      grid.appendChild(fig);
     });
   }
 
   function selectPoet(id) {
     window.Store.setPoet(id);
     if (window.Music) window.Music.click();
-    $$('.poet-card').forEach(function (c) { c.classList.toggle('is-chosen', c.getAttribute('data-id') === id); });
-    $$('.poet-card .tag-chosen').forEach(function (t) { t.remove(); });
-    var card = $('.poet-card[data-id="' + id + '"]');
-    if (card) card.insertAdjacentHTML('afterbegin', '<span class="tag-chosen">已择</span>');
+    $$('.figure').forEach(function (c) { c.classList.toggle('sel', c.getAttribute('data-id') === id); });
     renderSheet();
+    var ps = $('#poet-sheet'); if (ps) ps.classList.add('open');
     renderCompose();
     syncTop();
     toast('诗魂已择：<b>' + esc(poetById(id).name) + '</b> · ' + esc(poetById(id).styleName), 'good');
@@ -116,11 +119,13 @@ window.HUD = (function () {
     if (!box) return;
     var p = poetById(window.Store.get().poetId);
     if (!p) {
-      box.innerHTML = '<div class="empty">尚未择定诗魂。上方任选一位诗人，他将成为你的风格导师。</div>';
+      box.classList.remove('open');
+      box.innerHTML = '<div class="empty">尚未择定诗魂。点击庭院中的人物，他将成为你的风格导师。</div>';
       return;
     }
     var greet = p.greetings[Math.floor(Math.random() * p.greetings.length)];
     box.innerHTML =
+      '<button class="sheet-close" id="sheet-close" title="收起">×</button>' +
       '<div class="sheet-top"><strong>' + esc(p.name) + '</strong>' +
       '<span class="style">' + esc(p.styleName) + ' · ' + p.styleTags.map(esc).join('／') + '</span>' +
       '<span class="style">' + esc([p.zi ? '字' + p.zi : '', p.hao ? '号' + p.hao : ''].filter(Boolean).join(' · ')) + '</span></div>' +
@@ -133,6 +138,10 @@ window.HUD = (function () {
         '<button class="ghost-btn" id="sheet-badge">观其徽章</button>' +
       '</div>';
 
+    $('#sheet-close').addEventListener('click', function () {
+      if (window.Music) window.Music.click();
+      box.classList.remove('open');
+    });
     $('#sheet-compose').addEventListener('click', function () {
       if (window.Music) window.Music.click();
       switchTab('compose');
