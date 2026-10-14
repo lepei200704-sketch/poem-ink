@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>诗墨山河 · 古风诗词小游戏</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 背景层：彩色水墨卷轴 -->
+  <div id="bg-layer" aria-hidden="true"></div>
+  <div id="bg-veil" aria-hidden="true"></div>
+  <!-- Phaser 环境动画层（落花、流云、飞鸟、墨点） -->
+  <div id="scene-root" aria-hidden="true"></div>
+
+  <div id="app">
+    <header id="topbar">
+      <div class="brand">
+        <span class="seal">诗</span>
+        <div class="brand-text">
+          <h1>诗墨山河<span class="tag-preview">预览版</span></h1>
+          <p>古风诗词 · 择诗魂 · 赋新诗 · 闯诗关 · 集徽章</p>
+        </div>
+      </div>
+      <div class="status">
+        <div class="chip" id="chip-poet"><span class="chip-k">诗魂</span><b>未择</b></div>
+        <div class="chip chip-ink"><span class="chip-k">诗墨</span><b id="chip-points">0</b></div>
+        <button class="icon-btn" id="btn-llm" title="大模型设置"><span id="llm-label">✦</span></button>
+        <button class="icon-btn" id="btn-bgm" title="背景音乐：开 / 关"><span id="bgm-label">乐</span></button>
+        <button class="icon-btn" id="btn-reset" title="重置存档">↺</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- 1. 择诗魂 -->
+      <section class="panel is-active" id="panel-poet">
+        <div class="panel-head">
+          <h2>择一诗魂</h2>
+          <p>选一位诗人作为你的诗词风格导师。此后你的每一首新诗，都会染上他的气息。</p>
+        </div>
+        <div class="poet-grid" id="poet-grid"></div>
+        <div class="poet-sheet" id="poet-sheet"></div>
+      </section>
+
+      <!-- 2. 赋诗阁 -->
+      <section class="panel" id="panel-compose">
+        <div class="panel-head">
+          <h2>赋诗阁</h2>
+          <p>写下你此刻的所见、所感、所念。诗魂会以自身的风格，替你续成一首新诗。</p>
+        </div>
+        <div class="compose-wrap">
+          <div class="compose-left">
+            <div class="compose-poet" id="compose-poet"></div>
+            <label class="field-label" for="compose-input">此刻心事</label>
+            <textarea id="compose-input" rows="4" maxlength="60"
+              placeholder="例如：深夜听雨，想起远方的友人……"></textarea>
+          </div>
+          <div class="compose-right">
+            <div class="compose-controls">
+              <div class="seg" id="form-seg">
+                <button data-form="七言绝句" class="is-on">七言绝句</button>
+                <button data-form="五言绝句">五言绝句</button>
+              </div>
+              <button class="primary-btn" id="btn-generate">请君赋诗</button>
+            </div>
+            <div class="engine-hint" id="engine-hint"></div>
+            <div class="poem-paper" id="poem-paper">
+              <p class="paper-hint">尚未成诗。<br />写下几个字，请诗魂落笔。</p>
+            </div>
+          </div>
+        </div>
+        <div class="collection">
+          <div class="collection-head">
+            <h3>我的诗集</h3>
+            <span id="collection-count">0 首</span>
+          </div>
+          <div class="collection-grid" id="collection-grid"></div>
+        </div>
+      </section>
+
+      <!-- 3. 闯诗关 -->
+      <section class="panel" id="panel-quiz">
+        <div class="panel-head">
+          <h2>闯诗关</h2>
+          <p>择一诗题入关，答对得诗墨积分；连对越多，加成越高。</p>
+        </div>
+
+        <div class="quiz-setup" id="quiz-setup">
+          <div class="cat-row" id="cat-row"></div>
+          <button class="primary-btn big" id="btn-quiz-start" disabled>入 关</button>
+        </div>
+
+        <div class="quiz-stage" id="quiz-stage" hidden>
+          <div class="quiz-hud">
+            <div class="hud-cell"><span>题</span><b id="q-index">1/6</b></div>
+            <div class="hud-cell"><span>连击</span><b id="q-combo">0</b></div>
+            <div class="hud-cell"><span>得分</span><b id="q-score">0</b></div>
+            <div class="hud-cell wide">
+              <div class="timer"><i id="q-timer-bar"></i></div>
+            </div>
+          </div>
+          <div class="quiz-card">
+            <div class="q-type" id="q-type">诗句接续</div>
+            <div class="q-prompt" id="q-prompt">—</div>
+            <div class="q-options" id="q-options"></div>
+            <div class="q-explain" id="q-explain" hidden></div>
+          </div>
+          <button class="ghost-btn" id="btn-quiz-quit">离 关</button>
+        </div>
+
+        <div class="quiz-result" id="quiz-result" hidden></div>
+      </section>
+
+      <!-- 4. 徽章阁 -->
+      <section class="panel" id="panel-badge">
+        <div class="panel-head">
+          <h2>徽章阁</h2>
+          <p>以诗墨积分兑换重工非遗徽章。每枚徽章，都取自诗人一生的居处与旧物。</p>
+        </div>
+        <div class="badge-grid" id="badge-grid"></div>
+      </section>
+    </main>
+
+    <nav id="tabs">
+      <button data-tab="poet" class="is-on"><i>魂</i>择诗魂</button>
+      <button data-tab="compose"><i>墨</i>赋诗阁</button>
+      <button data-tab="quiz"><i>关</i>闯诗关</button>
+      <button data-tab="badge"><i>章</i>徽章阁</button>
+    </nav>
+  </div>
+
+  <div id="toast-wrap"></div>
+  <div id="modal-root"></div>
+
+  <script src="vendor/phaser.min.js"></script>
+  <script src="js/data/poets.js"></script>
+  <script src="js/data/poems.js"></script>
+  <script src="js/data/badges.js"></script>
+  <script src="js/systems/store.js"></script>
+  <script src="js/systems/audio.js"></script>
+  <script src="js/systems/generator.js"></script>
+  <script src="js/systems/llm.js"></script>
+  <script src="js/systems/quiz.js"></script>
+  <script src="js/ui/hud.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
