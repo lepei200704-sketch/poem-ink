@@ -194,7 +194,7 @@ html, body {
 .court-wrap { position: relative; overflow: hidden; border-radius: var(--radius); }
 .poet-scene {
   position: relative; aspect-ratio: 16 / 9; overflow: hidden;
-  background: url('../assets/bg-court.jpg') center bottom / cover no-repeat var(--paper-deep);
+  background: url('../assets/bg-court2.jpg') center bottom / cover no-repeat var(--paper-deep);
   border: 1px solid var(--paper-line); border-radius: var(--radius);
   box-shadow: 0 14px 40px -18px var(--shadow), inset 0 0 90px rgba(90,60,20,.14);
 }
@@ -210,8 +210,6 @@ html, body {
   background: radial-gradient(ellipse at center, rgba(45,30,12,.38), transparent 68%);
 }
 .fig-frame {
-  -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 95%);
-  mask-image: linear-gradient(to bottom, #000 58%, transparent 95%);
   transition: transform .35s var(--motion), filter .35s;
 }
 .fig-frame img { width: 100%; display: block; }
@@ -230,6 +228,12 @@ html, body {
 @keyframes fig-sway {
   from { transform: rotate(calc(var(--fr) - .7deg)) translateY(0); }
   to { transform: rotate(calc(var(--fr) + .7deg)) translateY(-4px); }
+}
+/* 坐姿人物（抚琴 / 题诗）的呼吸起伏 */
+.figure.anim-bob { animation-name: fig-bob; animation-duration: 4.4s; }
+@keyframes fig-bob {
+  from { transform: rotate(var(--fr)) translateY(0); }
+  to { transform: rotate(var(--fr)) translateY(-6px); }
 }
 
 .poet-sheet {

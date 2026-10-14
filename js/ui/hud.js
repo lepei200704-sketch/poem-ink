@@ -75,14 +75,21 @@ window.HUD = (function () {
   /* ============================================================
      1. 择诗魂
      ============================================================ */
-  /* 庭院雅集：五位诗魂的站位 / 体量 / 倾角 / 摇曳相位 */
+  /* 庭院雅集：五位诗魂的站位 / 体量 / 倾角 / 摇曳相位（顺序同 POETS） */
   var FIG_LAYOUT = [
-    { x: '5%',  w: '19%', r: '-2deg',   d: '0',   z: 3 },
-    { x: '24%', w: '17%', r: '1.2deg',  d: '0.7', z: 2 },
-    { x: '42%', w: '16%', r: '-0.6deg', d: '1.4', z: 1 },
-    { x: '60%', w: '17%', r: '0.9deg',  d: '0.4', z: 2 },
-    { x: '78%', w: '18%', r: '2deg',    d: '1.0', z: 3 }
+    { x: '21%', w: '16%', r: '-1.5deg', d: '0',   z: 2, anim: '' },         /* 李白 · 松下草地举杯 */
+    { x: '3%',  w: '13%', r: '1deg',    d: '0.7', z: 2, anim: '' },         /* 杜甫 · 月门拄杖远望 */
+    { x: '79%', w: '17%', r: '0.8deg',  d: '1.4', z: 3, anim: 'anim-bob' }, /* 王维 · 湖畔抚琴 */
+    { x: '54%', w: '22%', r: '0deg',    d: '0.4', z: 3, anim: 'anim-bob' }, /* 李清照 · 石案题诗 */
+    { x: '38%', w: '16%', r: '1.5deg',  d: '1.0', z: 2, anim: '' }          /* 苏轼 · 草地斟酒 */
   ];
+  var FIG_SPRITES = {
+    libai: 'assets/spr-libai.png',
+    dufu: 'assets/spr-dufu.png',
+    wangwei: 'assets/spr-wangwei.png',
+    liqingzhao: 'assets/spr-liqingzhao.png',
+    sushi: 'assets/spr-sushi.png'
+  };
 
   function renderPoets() {
     var grid = $('#poet-grid');
@@ -92,11 +99,11 @@ window.HUD = (function () {
     (window.POETS || []).forEach(function (p, i) {
       var L = FIG_LAYOUT[i % FIG_LAYOUT.length];
       var fig = document.createElement('div');
-      fig.className = 'figure' + (chosen === p.id ? ' sel' : '');
+      fig.className = 'figure' + (L.anim ? ' ' + L.anim : '') + (chosen === p.id ? ' sel' : '');
       fig.setAttribute('data-id', p.id);
       fig.setAttribute('style', '--fx:' + L.x + ';--fw:' + L.w + ';--fr:' + L.r + ';--fd:' + L.d + 's;--fz:' + L.z);
       fig.innerHTML =
-        '<div class="fig-frame"><img src="' + p.portrait + '" alt="' + esc(p.name) + '"></div>' +
+        '<div class="fig-frame"><img src="' + (FIG_SPRITES[p.id] || p.portrait) + '" alt="' + esc(p.name) + '"></div>' +
         '<span class="f-tag">' + esc(p.name) + ' · ' + esc(p.styleName) + '</span>';
       fig.addEventListener('click', function () { selectPoet(p.id); });
       grid.appendChild(fig);
