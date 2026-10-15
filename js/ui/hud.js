@@ -89,6 +89,16 @@ window.HUD = (function () {
     if (!grid) return;
     var chosen = window.Store.get().poetId;
     grid.innerHTML = '';
+    /* 雅集图微动态视频（静图为兜底海报） */
+    var vid = document.createElement('video');
+    vid.className = 'scene-video';
+    vid.src = 'assets/bg-gathering.mp4';
+    vid.poster = 'assets/bg-gathering.jpg';
+    vid.muted = true;
+    vid.loop = true;
+    vid.autoplay = true;
+    vid.setAttribute('playsinline', '');
+    grid.appendChild(vid);
     (window.POETS || []).forEach(function (p) {
       var L = FIG_ZONES[p.id] || { x: '0%', y: '0%', w: '20%', h: '40%', z: 1 };
       var fig = document.createElement('div');

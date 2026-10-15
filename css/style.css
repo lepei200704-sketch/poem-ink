@@ -197,11 +197,11 @@ html, body {
   background: url('../assets/bg-gathering.jpg') center / cover no-repeat var(--paper-deep);
   border: 1px solid var(--paper-line); border-radius: var(--radius);
   box-shadow: 0 14px 40px -18px var(--shadow), inset 0 0 90px rgba(90,60,20,.14);
-  animation: scene-breathe 14s ease-in-out infinite alternate;
 }
-@keyframes scene-breathe {
-  from { transform: scale(1); }
-  to { transform: scale(1.022); }
+/* 雅集图微动态视频：铺满画框，静图背景作为加载兜底 */
+.scene-video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
 }
 /* 单幅雅集图上的点击热区：悬停 / 选中时泛起金晕 */
 .figure {
