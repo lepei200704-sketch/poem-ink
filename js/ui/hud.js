@@ -75,40 +75,55 @@ window.HUD = (function () {
   /* ============================================================
      1. 择诗魂
      ============================================================ */
-  /* 五友雅集图（单幅统一画面）：每个人物在画中的点击热区（百分比） */
+  /* 五友雅集图（4K 全屏背景）：人物点击热区（画面百分比，由 JS 按 cover 算法换算为像素） */
   var FIG_ZONES = {
-    dufu:       { x: '12%',   y: '29%', w: '13.5%', h: '62%', z: 2 }, /* 杜甫 · 松下持卷吟咏 */
-    libai:      { x: '25.5%', y: '48%', w: '17%',   h: '43%', z: 2 }, /* 李白 · 草地举杯大笑 */
-    sushi:      { x: '40.5%', y: '41%', w: '15%',   h: '46%', z: 3 }, /* 苏轼 · 举壶斟酒 */
-    liqingzhao: { x: '54%',   y: '37%', w: '17%',   h: '36%', z: 3 }, /* 李清照 · 石案题诗 */
-    wangwei:    { x: '70%',   y: '44%', w: '21%',   h: '39%', z: 2 }  /* 王维 · 荷畔抚琴 */
+    dufu:       { x: 14, y: 27, w: 13, h: 63, z: 2 }, /* 杜甫 · 松下持卷吟咏 */
+    libai:      { x: 27, y: 52, w: 19, h: 42, z: 2 }, /* 李白 · 草地举杯大笑 */
+    sushi:      { x: 42, y: 45, w: 15, h: 48, z: 3 }, /* 苏轼 · 执壶斟酒 */
+    liqingzhao: { x: 55, y: 36, w: 18, h: 38, z: 3 }, /* 李清照 · 石案题诗 */
+    wangwei:    { x: 71, y: 44, w: 21, h: 50, z: 2 }  /* 王维 · 荷畔抚琴 */
   };
+
+  /* 背景图 object-fit:cover 的实际显示矩形换算，热区随视口重排 */
+  function layoutZones() {
+    var grid = $('#poet-grid');
+    if (!grid) return;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var ia = 16 / 9, va = vw / vh;
+    var dw, dh, ox, oy;
+    if (va > ia) { dw = vw; dh = vw / ia; ox = 0; oy = (vh - dh) / 2; }
+    else { dh = vh; dw = vh * ia; oy = 0; ox = (vw - dw) / 2; }
+    $$('.figure', grid).forEach(function (fig) {
+      var z = FIG_ZONES[fig.getAttribute('data-id')];
+      if (!z) return;
+      fig.style.left = (ox + dw * z.x / 100) + 'px';
+      fig.style.top = (oy + dh * z.y / 100) + 'px';
+      fig.style.width = (dw * z.w / 100) + 'px';
+      fig.style.height = (dh * z.h / 100) + 'px';
+    });
+  }
+  var resizeBound = false;
 
   function renderPoets() {
     var grid = $('#poet-grid');
     if (!grid) return;
     var chosen = window.Store.get().poetId;
     grid.innerHTML = '';
-    /* 雅集图微动态视频（静图为兜底海报） */
-    var vid = document.createElement('video');
-    vid.className = 'scene-video';
-    vid.src = 'assets/bg-gathering.mp4';
-    vid.poster = 'assets/bg-gathering.jpg';
-    vid.muted = true;
-    vid.loop = true;
-    vid.autoplay = true;
-    vid.setAttribute('playsinline', '');
-    grid.appendChild(vid);
     (window.POETS || []).forEach(function (p) {
-      var L = FIG_ZONES[p.id] || { x: '0%', y: '0%', w: '20%', h: '40%', z: 1 };
+      var L = FIG_ZONES[p.id] || { x: 0, y: 0, w: 20, h: 40, z: 1 };
       var fig = document.createElement('div');
       fig.className = 'figure' + (chosen === p.id ? ' sel' : '');
       fig.setAttribute('data-id', p.id);
-      fig.setAttribute('style', '--fx:' + L.x + ';--fy:' + L.y + ';--fw:' + L.w + ';--fh:' + L.h + ';--fz:' + L.z);
+      fig.style.zIndex = L.z;
       fig.innerHTML = '<span class="f-tag">' + esc(p.name) + ' · ' + esc(p.styleName) + '</span>';
       fig.addEventListener('click', function () { selectPoet(p.id); });
       grid.appendChild(fig);
     });
+    layoutZones();
+    if (!resizeBound) {
+      resizeBound = true;
+      window.addEventListener('resize', layoutZones);
+    }
   }
 
   function selectPoet(id) {
